@@ -1,0 +1,5 @@
+[task1]
+task1.sarajkins.space
+[task1:vars]
+ansible_host=51.250.68.4
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'

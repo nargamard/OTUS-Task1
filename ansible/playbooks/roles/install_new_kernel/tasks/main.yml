@@ -1,0 +1,57 @@
+---
+# Устанавливаем пакеты, нужные для сборки ядра
+- name: install packages for makes kernel
+  apt:
+    name: "{{ packages }}"
+    state: present 
+    update_cache: yes
+  vars:
+    packages:
+      - libncurses-dev
+      - dwarves
+      - build-essential
+      - gcc
+      - bc
+      - bison
+      - flex
+      - libssl-dev
+      - libelf-dev
+
+# Скаичиваем ядро
+- name: download kernel
+  get_url:
+    url: https://cdn.kernel.org/pub/linux/kernel/v{{ major_kernel_version }}.x/linux-{{ kernel_version }}.tar.xz
+    dest: /tmp/linux-{{ kernel_version }}.tar.xz
+
+# Разархивируем ядро
+- name: untar kernel
+  shell: tar -Jxvf linux-{{ kernel_version }}.tar.xz
+  args:
+    chdir: /tmp/
+
+# Устанавливаем ядро
+- name: install kernel
+  shell: make {{ type_config }} && make -j5 && make modules && make modules_install && make install
+  args:
+    chdir: /tmp/linux-{{ kernel_version }}/
+
+# Перезагружаем ноду
+- name: restart machine
+  reboot:
+ 
+# Ждём 5 минут пока нода перезагрузится 
+- name: Sleep for 300 seconds and continue with play
+  ansible.builtin.wait_for:
+    timeout: 300
+  delegate_to: localhost
+
+# Выводим версию ядра
+- name: confirm kernel version
+  shell: uname -r
+  register: print_kernel_version
+
+# - name: Print kernel versions
+#   debug: 
+#     msg: "Installed kernel verion: {{ print_kernel_version }}"
+
+- debug: var=print_kernel_version.stdout

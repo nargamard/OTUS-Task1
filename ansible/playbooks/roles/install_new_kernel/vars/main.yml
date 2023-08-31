@@ -1,0 +1,5 @@
+---
+
+major_kernel_version: 6  #Мажорная нужноговерсия ядра
+kernel_version: 6.4.13 #Полная версия нужного ядра #6.5 #6.4.13
+type_config: defconfig
